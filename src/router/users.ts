@@ -1,10 +1,8 @@
 import express from 'express'
-
-import { deleteUser, getAllUsers, updateUser } from 'controllers/users'
-import { isAuthenticated, isOwner } from 'middlewares'
+import { getUserInfo, updateUser } from 'controllers/users'
+import { isAuthorized, isOwner } from 'middlewares/authorization'
 
 export default (router: express.Router) => {
-    router.get('/users', isAuthenticated, getAllUsers)
-    router.delete('/users/:id', isAuthenticated, isOwner, deleteUser)
-    router.patch('/users/:id', isAuthenticated, isOwner, updateUser)
+    router.patch('/users/:id', isAuthorized, isOwner, updateUser)
+    router.get('/users/:id', getUserInfo)
 }

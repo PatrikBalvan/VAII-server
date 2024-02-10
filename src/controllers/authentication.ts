@@ -1,35 +1,53 @@
 import express from 'express'
+import bcrypt from 'bcrypt'
+import z from 'zod'
+import jwt from 'jsonwebtoken'
 import { createUser, getUserByEmail } from '../models/users'
-import { authentication, random } from '../helpers/encryptionHelper'
+
+const createToken = (_id: string) => {
+    return jwt.sign({_id}, process.env.SECRET)
+}
 
 export const register = async (req: express.Request, res: express.Response) => {
     try {
-        const { email, password, username } = req.body
+        const { email, username, password } = req.body
 
-        if(!email || !password || !username) {
-            return res.sendStatus(400)
+        if(!email || !username || !password) {
+            throw new Error('Missing required fields')
         }
 
         const existingUser = await getUserByEmail(email)
 
         if(existingUser) {
-            return res.sendStatus(400)
+            throw new Error('User with such email exists already')
         }
 
-        const salt = random()
+        const userSchema = z.object({
+            email: z.string().email(),
+            username: z.string().min(5),
+            password: z.string().min(8)
+        })
+
+        const result = userSchema.safeParse({email, username, password})
+        if(!result.success) {
+            throw new Error('Fields dont match criteria')
+        }
+
+        const salt = await bcrypt.genSalt()
+        const hash = await bcrypt.hash(password, salt)
+
         const user = await createUser({
             email,
             username,
-            authentication: {
-                salt,
-                password: authentication(salt, password)
-            }
+            password: hash
         })
 
-        return res.status(200).json(user).end()
+
+        const token = createToken(user._id.toString())
+
+        return res.status(200).json({email, username, _id: user._id.toString(), token})
     } catch(error) {
-        console.error(error)
-        return res.sendStatus(400)
+        return res.status(400).json({message: error.message})
     }
 }
 
@@ -38,31 +56,25 @@ export const login = async (req: express.Request, res: express.Response) => {
         const { email, password } = req.body
 
         if(!email || !password) {
-            return res.sendStatus(400)
+            throw new Error('Missing required fields')
         }
 
-        const user = await getUserByEmail(email).select('+authentication.salt +authentication.password')
+        const user = await getUserByEmail(email)
 
         if(!user) {
-            return res.sendStatus(400)
+            throw new Error('User with such email does not exist')
         }
 
-        const expectedHash = authentication(user.authentication.salt, password)
+        const passwordMatch = await bcrypt.compare(password, user.password)
 
-        if(user.authentication.password !== expectedHash) {
-            return res.sendStatus(403)
+        if(!passwordMatch) {
+            throw new Error('Password does not match')
         }
 
-        const salt = random()
-        user.authentication.session = authentication(salt, user._id.toString())
+        const token = createToken(user._id.toString())
 
-        await user.save()
-
-        res.cookie('VAII-AUTH', user.authentication.session, { domain: 'localhost', path: '/' })
-
-        return res.status(200).json(user).end()
+        return res.status(200).json({email, username: user.username, _id: user._id.toString(), token})
     } catch(error) {
-        console.error(error)
-        return res.sendStatus(400)
+        return res.status(400).json({message: error.message})
     }
 }

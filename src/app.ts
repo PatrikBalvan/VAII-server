@@ -5,12 +5,12 @@ import cookieParser from 'cookie-parser'
 import compression from 'compression'
 import cors from 'cors'
 import mongoose from 'mongoose'
+import dotenv from 'dotenv'
 
 import router from './router'
 
 
-const PORT: number = 7000
-const dbURL: string = 'mongodb://localhost:27017/VAII'
+dotenv.config()
 
 const app = express()
 
@@ -24,12 +24,12 @@ app.use(bodyParser.json())
 
 const server = http.createServer(app)
 
-server.listen(PORT, () => {
-    console.log(`Server listening on ${PORT}`)
+server.listen(process.env.PORT, () => {
+    console.log(`Server listening on ${process.env.PORT}`)
 })
 
 mongoose.Promise = Promise
-mongoose.connect(dbURL)
+mongoose.connect(process.env.dbURL)
 mongoose.connection.on('error', (error: Error) => { console.error(error) })
 
 app.use('/', router())
