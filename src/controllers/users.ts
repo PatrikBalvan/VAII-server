@@ -1,6 +1,6 @@
 import express from 'express'
 import { Request } from 'interfaces/declarations'
-import { getUserByUsername, getUserByEmail, getUserById, getUsers } from 'models/users'
+import { getUserByUsername, getUserByEmail, getUserById, getUsers, getUsersWithRole } from 'models/users'
 import z from 'zod'
 import bcrypt from 'bcrypt'
 
@@ -142,4 +142,35 @@ export const removeUserAdmin = async (req: Request, res: express.Response) => {
 
 export const continueFunc = async (req: Request, res: express.Response) => {
         return res.sendStatus(200)
+}
+
+export const getAllUsers = async (req: Request, res: express.Response) => {
+    try {
+        const users = await getUsers()
+
+        return res.status(200).json(users)
+    } catch (error) {
+        res.status(400).json({message: error.message})
+    }
+}
+
+export const getAllAdmins = async (req: Request, res: express.Response) => {
+    try {
+        const users = await getUsersWithRole('Admin').select('email')
+
+        return res.status(200).json(users)
+    } catch (error) {
+        console.error(error)
+        res.status(400).json({message: error})
+    }
+}
+
+export const getAllEditors = async (req: Request, res: express.Response) => {
+    try {
+        const users = await getUsersWithRole('Editor').select('email')
+
+        return res.status(200).json(users)
+    } catch (error) {
+        res.status(400).json({message: error.message})
+    }
 }

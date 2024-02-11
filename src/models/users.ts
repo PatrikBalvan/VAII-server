@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
 export const userModel =  mongoose.model('user', userSchema)
 
 export const getUsers = () => userModel.find()
+export const getUsersWithRole = (role: string) => userModel.find({ role: role })
 export const getUserByEmail = (email: string) => userModel.findOne({ email })
 export const getUserByUsername = (username: string) => userModel.findOne({ username })
 export const getUserById = (id: string) => userModel.findById(id)

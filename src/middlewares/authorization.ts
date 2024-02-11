@@ -49,7 +49,6 @@ export const isEditor = async (req: Request, res: express.Response, next: expres
 
         next()
     } catch(error) {
-        console.error(error)
         return res.sendStatus(401)
     }
 }
@@ -62,10 +61,8 @@ export const isAdmin = async (req: Request, res: express.Response, next: express
         if(user.role !== 'Admin') {
             throw new Error('Not admin')
         }
-
         next()
     } catch(error) {
-        console.error(error)
         return res.sendStatus(401)
     }
 }

@@ -7,16 +7,16 @@ import { articleModel, createArticle, getArticleById, getArticles, getUsersArtic
 
 export const newArticle = async (req: Request, res: express.Response) => {
     try {
-        const {title, body, authorId} = req.body
+        const {title, body} = req.body
 
-        if(!title || !body || !authorId) {
+        if(!title || !body) {
             throw new Error('Nevyplnené jedno z povinnych poli!')
         }
 
         const article = await createArticle({
             title,
             body,
-            authorId
+            authorId: req.user
         })
 
         return res.status(200).json(article)
