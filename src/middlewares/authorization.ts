@@ -43,7 +43,7 @@ export const isEditor = async (req: Request, res: express.Response, next: expres
         const userId = req.user
         const user = await getUserById(userId)
 
-        if(user.role !== 'Editor') {
+        if(user.role !== 'Editor' && user.role !== 'Admin') {
             throw new Error('Not editor')
         }
 
