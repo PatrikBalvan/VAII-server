@@ -3,7 +3,7 @@ import { Request } from 'interfaces/declarations'
 import { deleteUserById, getUserByEmail, getUserById, getUsers } from 'models/users'
 import z from 'zod'
 import bcrypt from 'bcrypt'
-import { articleModel, createArticle, getArticles, getUsersArticles } from 'models/articles'
+import { articleModel, createArticle, getArticleById, getArticles, getUsersArticles } from 'models/articles'
 
 export const newArticle = async (req: Request, res: express.Response) => {
     try {
@@ -52,6 +52,19 @@ export const getAllArticles = async (req: Request, res: express.Response) => {
         const resultArticles = articles.slice(low, high)
 
         return res.status(200).json(resultArticles)
+    } catch (error) {
+        console.error(error)
+        res.sendStatus(400)
+    }
+}
+
+export const getArticleWithId = async (req: Request, res: express.Response) => {
+    try {
+        const {articleId} = req.params
+
+        const article = await getArticleById(articleId)
+
+        return res.status(200).json(article)
     } catch (error) {
         console.error(error)
         res.sendStatus(400)
