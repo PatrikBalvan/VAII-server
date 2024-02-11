@@ -1,6 +1,6 @@
 import express from 'express'
 import { Request } from 'interfaces/declarations'
-import { deleteUserById, getUserByEmail, getUserById, getUsers } from 'models/users'
+import { getUserByUsername, getUserByEmail, getUserById, getUsers } from 'models/users'
 import z from 'zod'
 import bcrypt from 'bcrypt'
 
@@ -9,10 +9,26 @@ export const updateUser = async (req: Request, res: express.Response) => {
         const user = await getUserById(req.user)
         const {email, username, password} = req.body
 
-        const existingUser = await getUserByEmail(email)
+        const existingUserByEmail = await getUserByEmail(email)
+        const existingUserByUsername = await getUserByUsername(username)
 
-        if(existingUser && existingUser._id.toString() !== user._id.toString()) {
-            throw new Error('User with such email exists already')
+        if(existingUserByEmail && existingUserByEmail._id.toString() !== user._id.toString()) {
+            throw new Error('Uživateľ s takym mailom už existuje!')
+        }
+
+        if(existingUserByUsername && existingUserByUsername._id.toString() !== user._id.toString()) {
+            throw new Error('Uživateľ s takym menom už existuje!')
+        }
+
+        const userSchema = z.object({
+            email: z.string().email(),
+            username: z.string().min(5),
+            password: z.string().min(8,).optional().or(z.literal(''))
+        })
+
+        const result = userSchema.safeParse({email, username, password})
+        if(!result.success) {
+            throw new Error('Polia nesplňaju kriteria!')
         }
 
         if(username) {
@@ -33,7 +49,7 @@ export const updateUser = async (req: Request, res: express.Response) => {
 
         return res.status(200).json({username: user.username, email: user.email})
     } catch (error) {
-        res.sendStatus(400)
+        res.status(400).json({message: error.message})
     }
 }
 
@@ -43,11 +59,11 @@ export const getUserInfo = async (req: Request, res: express.Response) => {
         const user = await getUserById(id)
 
         if(!user) {
-            throw new Error('User doesnt exist')
+            throw new Error('Uživateľ neexistuje')
         }
 
         return res.status(200).json(user)
     } catch (error) {
-        res.sendStatus(400)
+        res.status(400).json({message: error.message})
     }
 }

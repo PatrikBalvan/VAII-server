@@ -10,7 +10,7 @@ export const userModel =  mongoose.model('user', userSchema)
 
 export const getUsers = () => userModel.find()
 export const getUserByEmail = (email: string) => userModel.findOne({ email })
-export const getUserBySession = (session: string) => userModel.findOne({ 'authentication.session': session })
+export const getUserByUsername = (username: string) => userModel.findOne({ username })
 export const getUserById = (id: string) => userModel.findById(id)
 export const createUser = (usr: Record<string, any>) => new userModel(usr).save().then((user) => user.toObject())
 export const deleteUserById = (id: string) => userModel.findByIdAndDelete(id)

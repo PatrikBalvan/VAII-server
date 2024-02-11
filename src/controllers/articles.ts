@@ -10,7 +10,7 @@ export const newArticle = async (req: Request, res: express.Response) => {
         const {title, body, authorId} = req.body
 
         if(!title || !body || !authorId) {
-            throw new Error('Missing required field')
+            throw new Error('Nevyplnené jedno z povinnych poli!')
         }
 
         const article = await createArticle({
@@ -22,7 +22,7 @@ export const newArticle = async (req: Request, res: express.Response) => {
         return res.status(200).json(article)
     } catch (error) {
         console.error(error)
-        res.sendStatus(400)
+        res.status(400).json({message: error.message})
     }
 }
 
@@ -31,7 +31,7 @@ export const getArticlesForUser = async (req: Request, res: express.Response) =>
         const {authorId} = req.params
 
         if(!authorId) {
-            throw new Error('Missing required field')
+            throw new Error('Nevyplnené jedno z povinnych poli!')
         }
 
         const articles = await getUsersArticles(authorId)
@@ -39,7 +39,7 @@ export const getArticlesForUser = async (req: Request, res: express.Response) =>
         return res.status(200).json(articles)
     } catch (error) {
         console.error(error)
-        res.sendStatus(400)
+        res.status(400).json({message: error.message})
     }
 }
 

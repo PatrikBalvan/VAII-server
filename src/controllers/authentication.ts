@@ -2,7 +2,7 @@ import express from 'express'
 import bcrypt from 'bcrypt'
 import z from 'zod'
 import jwt from 'jsonwebtoken'
-import { createUser, getUserByEmail } from '../models/users'
+import { createUser, getUserByEmail, getUserByUsername } from '../models/users'
 
 const createToken = (_id: string) => {
     return jwt.sign({_id}, process.env.SECRET)
@@ -13,13 +13,18 @@ export const register = async (req: express.Request, res: express.Response) => {
         const { email, username, password } = req.body
 
         if(!email || !username || !password) {
-            throw new Error('Missing required fields')
+            throw new Error('Nevyplnené jedno z povinnych poli!')
         }
 
-        const existingUser = await getUserByEmail(email)
+        const existingUserByEmail = await getUserByEmail(email)
+        const existingUserByUsername = await getUserByUsername(username)
 
-        if(existingUser) {
-            throw new Error('User with such email exists already')
+        if(existingUserByEmail) {
+            throw new Error('Uživateľ s takym mailom už existuje!')
+        }
+
+        if(existingUserByUsername) {
+            throw new Error('Uživateľ s takym menom už existuje!')
         }
 
         const userSchema = z.object({
@@ -30,7 +35,7 @@ export const register = async (req: express.Request, res: express.Response) => {
 
         const result = userSchema.safeParse({email, username, password})
         if(!result.success) {
-            throw new Error('Fields dont match criteria')
+            throw new Error('Polia nesplňaju kriteria!')
         }
 
         const salt = await bcrypt.genSalt()
@@ -56,19 +61,19 @@ export const login = async (req: express.Request, res: express.Response) => {
         const { email, password } = req.body
 
         if(!email || !password) {
-            throw new Error('Missing required fields')
+            throw new Error('Nevyplnené jedno z povinnych poli!')
         }
 
         const user = await getUserByEmail(email)
 
         if(!user) {
-            throw new Error('User with such email does not exist')
+            throw new Error('Uživateľ s takym mailom neexistuje')
         }
 
         const passwordMatch = await bcrypt.compare(password, user.password)
 
         if(!passwordMatch) {
-            throw new Error('Password does not match')
+            throw new Error('Nezhoduje sa heslo!')
         }
 
         const token = createToken(user._id.toString())
