@@ -10,6 +10,7 @@ export const articleModel =  mongoose.model('article', articleSchema)
 
 export const getArticles = () => articleModel.find()
 export const getArticleById = (id: string) => articleModel.findById(id)
+export const getArticlesById = (ids: string[]) => articleModel.find().where('_id').in(ids).exec()
 export const createArticle = (article: Record<string, any>) => new articleModel(article).save().then((art) => art.toObject())
 export const getUsersArticles = (authorId: string) => articleModel.find({ authorId }) 
 
