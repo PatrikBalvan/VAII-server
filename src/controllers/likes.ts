@@ -85,7 +85,7 @@ export const getArticleLikes = async (req: Request, res: express.Response) => {
 export const getUserLikes = async (req: Request, res: express.Response) => {
     try {
         const { userId } = req.params
-        const page = req.query.page
+        const { page, articlesPerPage } = req.query
         
         if(userId !== req.user) {
             throw new Error('Možeš len svoje liky ziskať!')
@@ -100,8 +100,8 @@ export const getUserLikes = async (req: Request, res: express.Response) => {
 
         const likedArticles = await getArticlesById(articleIds)
 
-        const low = (+page - 1) * 5
-        const high = +page * 5
+        const low = (+page - 1) * +articlesPerPage
+        const high = +page * +articlesPerPage
         const resultArticles = likedArticles.slice(low, high)
 
         return res.status(200).json(resultArticles)

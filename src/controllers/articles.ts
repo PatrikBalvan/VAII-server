@@ -45,10 +45,10 @@ export const getArticlesForUser = async (req: Request, res: express.Response) =>
 
 export const getAllArticles = async (req: Request, res: express.Response) => {
     try {
-        const page = req.query.page
+        const { page, articlesPerPage } = req.query
         const articles = await getArticles()
-        const low = (+page - 1) * 5
-        const high = +page * 5
+        const low = (+page - 1) * +articlesPerPage
+        const high = +page * +articlesPerPage
         const resultArticles = articles.slice(low, high)
 
         return res.status(200).json(resultArticles)

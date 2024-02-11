@@ -67,3 +67,79 @@ export const getUserInfo = async (req: Request, res: express.Response) => {
         res.status(400).json({message: error.message})
     }
 }
+
+export const makeUserEditor = async (req: Request, res: express.Response) => {
+    try {
+        const { id } = req.params
+        const user = await getUserById(id)
+
+        if(!user) {
+            throw new Error('Uživateľ neexistuje')
+        }
+
+        user.role = 'Editor'
+        await user.save()
+
+        return res.sendStatus(200)
+    } catch (error) {
+        res.status(400).json({message: error.message})
+    }
+}
+
+export const removeUserEditor = async (req: Request, res: express.Response) => {
+    try {
+        const { id } = req.params
+        const user = await getUserById(id)
+
+        if(!user) {
+            throw new Error('Uživateľ neexistuje')
+        }
+
+        user.role = ''
+        await user.save()
+
+        return res.sendStatus(200)
+    } catch (error) {
+        res.status(400).json({message: error.message})
+    }
+}
+
+export const makeUserAdmin = async (req: Request, res: express.Response) => {
+    try {
+        const { id } = req.params
+        const user = await getUserById(id)
+
+        if(!user) {
+            throw new Error('Uživateľ neexistuje')
+        }
+
+        user.role = 'Admin'
+        await user.save()
+
+        return res.sendStatus(200)
+    } catch (error) {
+        res.status(400).json({message: error.message})
+    }
+}
+
+export const removeUserAdmin = async (req: Request, res: express.Response) => {
+    try {
+        const { id } = req.params
+        const user = await getUserById(id)
+
+        if(!user) {
+            throw new Error('Uživateľ neexistuje')
+        }
+
+        user.role = ''
+        await user.save()
+
+        return res.sendStatus(200)
+    } catch (error) {
+        res.status(400).json({message: error.message})
+    }
+}
+
+export const continueFunc = async (req: Request, res: express.Response) => {
+        return res.sendStatus(200)
+}
