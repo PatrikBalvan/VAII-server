@@ -70,8 +70,8 @@ export const getUserInfo = async (req: Request, res: express.Response) => {
 
 export const makeUserEditor = async (req: Request, res: express.Response) => {
     try {
-        const { id } = req.params
-        const user = await getUserById(id)
+        const { email } = req.params
+        const user = await getUserByEmail(email)
 
         if(!user) {
             throw new Error('Uživateľ neexistuje')
@@ -106,8 +106,8 @@ export const removeUserEditor = async (req: Request, res: express.Response) => {
 
 export const makeUserAdmin = async (req: Request, res: express.Response) => {
     try {
-        const { id } = req.params
-        const user = await getUserById(id)
+        const { email } = req.params
+        const user = await getUserByEmail(email)
 
         if(!user) {
             throw new Error('Uživateľ neexistuje')
@@ -156,7 +156,7 @@ export const getAllUsers = async (req: Request, res: express.Response) => {
 
 export const getAllAdmins = async (req: Request, res: express.Response) => {
     try {
-        const users = await getUsersWithRole('Admin').select('email')
+        const users = await getUsersWithRole('Admin').select('email username')
 
         return res.status(200).json(users)
     } catch (error) {
@@ -167,7 +167,7 @@ export const getAllAdmins = async (req: Request, res: express.Response) => {
 
 export const getAllEditors = async (req: Request, res: express.Response) => {
     try {
-        const users = await getUsersWithRole('Editor').select('email')
+        const users = await getUsersWithRole('Editor').select('email username')
 
         return res.status(200).json(users)
     } catch (error) {
