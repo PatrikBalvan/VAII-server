@@ -22,8 +22,8 @@ export const updateUser = async (req: Request, res: express.Response) => {
 
         const userSchema = z.object({
             email: z.string().email(),
-            username: z.string().min(5),
-            password: z.string().min(8,).optional().or(z.literal(''))
+            username: z.string().min(5).max(10),
+            password: z.string().min(8).max(15).optional().or(z.literal(''))
         })
 
         const result = userSchema.safeParse({email, username, password})

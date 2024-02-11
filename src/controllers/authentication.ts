@@ -29,8 +29,8 @@ export const register = async (req: express.Request, res: express.Response) => {
 
         const userSchema = z.object({
             email: z.string().email(),
-            username: z.string().min(5),
-            password: z.string().min(8)
+            username: z.string().min(5).max(10),
+            password: z.string().min(8).max(15)
         })
 
         const result = userSchema.safeParse({email, username, password})
