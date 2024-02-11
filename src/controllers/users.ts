@@ -56,7 +56,7 @@ export const updateUser = async (req: Request, res: express.Response) => {
 export const getUserInfo = async (req: Request, res: express.Response) => {
     try {
         const { id } = req.params
-        const user = await getUserById(id)
+        const user = await getUserById(id).select('email username role')
 
         if(!user) {
             throw new Error('Uživateľ neexistuje')

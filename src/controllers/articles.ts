@@ -70,3 +70,20 @@ export const getArticleWithId = async (req: Request, res: express.Response) => {
         res.sendStatus(400)
     }
 }
+
+export const updateArticle = async (req: Request, res: express.Response) => {
+    try {
+        const {articleId} = req.params
+        const {title, body} = req.body
+
+        const article = await getArticleById(articleId)
+        article.title = title
+        article.body = body
+        article.save()
+
+        return res.status(200).json(article)
+    } catch (error) {
+        console.error(error)
+        res.sendStatus(400)
+    }
+}
