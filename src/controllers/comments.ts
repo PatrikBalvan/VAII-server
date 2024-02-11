@@ -1,7 +1,7 @@
 import express from "express"
 import { Request } from 'interfaces/declarations'
 import { getArticleById } from "models/articles"
-import { createComment, getArticleComments } from "models/comments"
+import { createComment, deleteCommentWithId, getArticleComments, getCommentById } from "models/comments"
 import { getUserById } from "models/users"
 
 export const addComment = async (req: Request, res: express.Response) => {
@@ -56,6 +56,19 @@ export const getComments = async (req: Request, res: express.Response) => {
         }
 
         return res.status(200).json(coms)
+    } catch (error) {
+        //console.error(error)
+        res.status(400).json({message: error.message})
+    }
+}
+
+export const deleteComment = async (req: Request, res: express.Response) => {
+    try {
+        const { commentId } = req.params
+
+        await deleteCommentWithId(commentId)
+
+        return res.sendStatus(200)
     } catch (error) {
         //console.error(error)
         res.status(400).json({message: error.message})
